@@ -10,12 +10,13 @@ type WeatherService struct {
 }
 
 type CurrentWeatherResponse struct {
-	City            string `json:"city"`
-	Temperature     int    `json:"temperature"`
-	Condition       string `json:"condition"`
-	SourceURL       string `json:"source_url"`
-	ExternalStatus  int    `json:"external_status"`
-	GeocodingStatus int    `json:"geocoding_status"`
+	City           string  `json:"city"`
+	Temperature    int     `json:"temperature"`
+	Condition      string  `json:"condition"`
+	SourceURL      string  `json:"source_url"`
+	ExternalStatus int     `json:"external_status"`
+	Latitude       float64 `json:"latitude"`
+	Longitude      float64 `json:"longitude"`
 }
 
 type CityWeatherResponse struct {
@@ -38,18 +39,19 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 		return CurrentWeatherResponse{}, err
 	}
 
-	geocodingStatus, err := s.client.GeocodingStatus(ctx, city)
+	lat, lon, err := s.client.GeocodeCity(ctx, city)
 	if err != nil {
 		return CurrentWeatherResponse{}, err
 	}
 
 	return CurrentWeatherResponse{
-		City:            city,
-		Temperature:     0,
-		Condition:       "stub",
-		SourceURL:       url,
-		ExternalStatus:  status,
-		GeocodingStatus: geocodingStatus,
+		City:           city,
+		Temperature:    0,
+		Condition:      "stub",
+		SourceURL:      url,
+		ExternalStatus: status,
+		Latitude:       lat,
+		Longitude:      lon,
 	}, nil
 }
 
