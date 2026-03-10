@@ -119,8 +119,14 @@ func (c *WeatherClient) GeocodeCity(ctx context.Context, city string) (float64, 
 	}
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil || resp.StatusCode != http.StatusOK {
+	if err != nil {
 		return 0, 0, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return 0, 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	var geoResp geocodingResponse
