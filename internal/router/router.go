@@ -8,17 +8,18 @@ import (
 
 func New() *gin.Engine {
 	r := gin.New()
+	h := handler.New()
 
 	r.Use(gin.Logger(), gin.Recovery())
 
-	r.GET("/health", handler.Health)
+	r.GET("/health", h.Health)
 
 	apiV1 := r.Group("/api/v1")
-	apiV1.GET("/health", handler.Health)
+	apiV1.GET("/health", h.Health)
 
 	weather := apiV1.Group("/weather")
-	weather.GET("/current", handler.GetCurrentWeather)
-	weather.GET("/cities/:city", handler.GetWeatherByCity)
+	weather.GET("/current", h.GetCurrentWeather)
+	weather.GET("/cities/:city", h.GetWeatherByCity)
 
 	return r
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Health(c *gin.Context) {
-	WriteJSON(c, http.StatusOK, gin.H{
+func (h *Handler) Health(c *gin.Context) {
+	writeJSON(c, http.StatusOK, gin.H{
 		"status": "ok",
 	})
 }

@@ -6,14 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetCurrentWeather(c *gin.Context) {
+func (h *Handler) GetCurrentWeather(c *gin.Context) {
 	city := c.Query("city")
 	if city == "" {
-		WriteError(c, http.StatusBadRequest, "city is required")
+		writeError(c, http.StatusBadRequest, "city is required")
 		return
 	}
 
-	WriteJSON(c, http.StatusOK, gin.H{
+	writeJSON(c, http.StatusOK, gin.H{
 		"city":        city,
 		"temperature": 0,
 		"condition":   "stub",
@@ -21,14 +21,14 @@ func GetCurrentWeather(c *gin.Context) {
 	return
 }
 
-func GetWeatherByCity(c *gin.Context) {
+func (h *Handler) GetWeatherByCity(c *gin.Context) {
 	city := c.Param("city")
 	if city == "" {
-		WriteError(c, http.StatusBadRequest, "city is required")
+		writeError(c, http.StatusBadRequest, "city is required")
 		return
 	}
 
-	WriteJSON(c, http.StatusOK, gin.H{
+	writeJSON(c, http.StatusOK, gin.H{
 		"city":        city,
 		"source":      "path",
 		"temperature": 0,
