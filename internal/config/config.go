@@ -24,7 +24,7 @@ func Load() *Config {
 
 	requestTimeout := os.Getenv("REQUEST_TIMEOUT")
 	if requestTimeout == "" {
-		requestTimeout = "5"
+		requestTimeout = "5s"
 	}
 	requestTimeoutParsed, _ := time.ParseDuration(requestTimeout)
 
