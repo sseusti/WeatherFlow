@@ -3,6 +3,7 @@ package service
 import (
 	"WeatherFlow/internal/client"
 	"context"
+	"strconv"
 )
 
 type WeatherService struct {
@@ -33,16 +34,20 @@ func NewWeatherService(client *client.WeatherClient) *WeatherService {
 }
 
 func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWeatherResponse, error) {
-	url := s.client.CurrentWeatherURL(city)
-	status, err := s.client.CurrentWeatherStatus(ctx, city)
-	if err != nil {
-		return CurrentWeatherResponse{}, err
-	}
-
 	lat, lon, err := s.client.GeocodeCity(ctx, city)
 	if err != nil {
 		return CurrentWeatherResponse{}, err
 	}
+
+	latStr := strconv.FormatFloat(lat, 'f', -1, 64)
+	lonStr := strconv.FormatFloat(lon, 'f', -1, 64)
+
+	status, err := s.client.ForecastStatus(ctx, latStr, lonStr)
+	if err != nil {
+		return CurrentWeatherResponse{}, err
+	}
+
+	url := s.client.ForecastURL(latStr, lonStr)
 
 	return CurrentWeatherResponse{
 		City:           city,

@@ -141,3 +141,9 @@ func (c *WeatherClient) GeocodeCity(ctx context.Context, city string) (float64, 
 
 	return geoResp.Results[0].Latitude, geoResp.Results[0].Longitude, nil
 }
+
+func (c *WeatherClient) ForecastStatus(ctx context.Context, lat, lon string) (int, error) {
+	u := c.ForecastURL(lat, lon)
+
+	return c.getStatus(ctx, u)
+}
