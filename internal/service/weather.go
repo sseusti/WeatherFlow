@@ -7,17 +7,17 @@ type WeatherService struct {
 }
 
 type CurrentWeatherResponse struct {
-	City        string
-	Temperature int
-	Condition   string
-	SourceURL   string
+	City        string `json:"city"`
+	Temperature int    `json:"temperature"`
+	Condition   string `json:"condition"`
+	SourceURL   string `json:"source_url"`
 }
 
 type CityWeatherResponse struct {
-	City        string
-	Temperature int
-	Condition   string
-	Source      string
+	City        string `json:"city"`
+	Temperature int    `json:"temperature"`
+	Condition   string `json:"condition"`
+	Source      string `json:"source"`
 }
 
 func NewWeatherService(client *client.WeatherClient) *WeatherService {
