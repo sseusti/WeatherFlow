@@ -10,6 +10,8 @@ import (
 func main() {
 	router := gin.New()
 
+	router.Use(gin.Recovery(), gin.Logger())
+
 	router.GET("/health", handler.Health)
 
 	err := router.Run(":8080")
