@@ -42,3 +42,16 @@ func (c *WeatherClient) CurrentWeatherURL(city string) string {
 
 	return u.String()
 }
+
+func (c *WeatherClient) CurrentWeatherStatus(city string) (int, error) {
+	u := c.CurrentWeatherURL(city)
+
+	resp, err := c.httpClient.Get(u)
+	if err != nil {
+		return 0, err
+	}
+
+	defer resp.Body.Close()
+
+	return resp.StatusCode, nil
+}
