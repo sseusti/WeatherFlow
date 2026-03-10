@@ -49,19 +49,7 @@ func (c *WeatherClient) CurrentWeatherURL(city string) string {
 func (c *WeatherClient) CurrentWeatherStatus(ctx context.Context, city string) (int, error) {
 	u := c.CurrentWeatherURL(city)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return 0, err
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return 0, err
-	}
-
-	defer resp.Body.Close()
-
-	return resp.StatusCode, nil
+	return c.getStatus(ctx, u)
 }
 
 func (c *WeatherClient) ForecastURL(lat, lon string) string {
@@ -93,7 +81,12 @@ func (c *WeatherClient) GeocodingURL(city string) string {
 
 func (c *WeatherClient) GeocodingStatus(ctx context.Context, city string) (int, error) {
 	u := c.GeocodingURL(city)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+
+	return c.getStatus(ctx, u)
+}
+
+func (c *WeatherClient) getStatus(ctx context.Context, rawURL string) (int, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
 		return 0, err
 	}
