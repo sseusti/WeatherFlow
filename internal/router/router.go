@@ -13,8 +13,8 @@ func New() *gin.Engine {
 
 	r.GET("/health", handler.Health)
 
-	api := r.Group("/api/v1")
-	api.GET("/health", handler.Health)
-
+	apiV1 := r.Group("/api/v1")
+	apiV1.GET("/health", handler.Health)
+	apiV1.GET("/weather/current", handler.GetCurrentWeather)
 	return r
 }
