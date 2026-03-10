@@ -30,11 +30,11 @@ func NewWeatherService(client *client.WeatherClient) *WeatherService {
 	}
 }
 
-func (s *WeatherService) GetCurrent(ctx context.Context, city string) CurrentWeatherResponse {
+func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWeatherResponse, error) {
 	url := s.client.CurrentWeatherURL(city)
 	status, err := s.client.CurrentWeatherStatus(ctx, city)
 	if err != nil {
-		status = 0
+		return CurrentWeatherResponse{}, err
 	}
 
 	return CurrentWeatherResponse{
@@ -43,7 +43,7 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) CurrentWea
 		Condition:      "stub",
 		SourceURL:      url,
 		ExternalStatus: status,
-	}
+	}, nil
 }
 
 func (s *WeatherService) GetByCity(city string) CityWeatherResponse {

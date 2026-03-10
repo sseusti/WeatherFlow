@@ -13,7 +13,13 @@ func (h *Handler) GetCurrentWeather(c *gin.Context) {
 		return
 	}
 
-	writeJSON(c, http.StatusOK, h.weatherService.GetCurrent(c.Request.Context(), city))
+	response, err := h.weatherService.GetCurrent(c.Request.Context(), city)
+	if err != nil {
+		writeError(c, http.StatusInternalServerError, "failed to fetch external weather status")
+		return
+	}
+
+	writeJSON(c, http.StatusOK, response)
 	return
 }
 
