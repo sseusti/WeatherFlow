@@ -44,7 +44,7 @@ func GetWeatherByCity(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		gin.H{
-			"city":        "berlin",
+			"city":        city,
 			"source":      "path",
 			"temperature": 0,
 			"condition":   "stub",
