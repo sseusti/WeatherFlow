@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"time"
@@ -43,10 +44,11 @@ func (c *WeatherClient) CurrentWeatherURL(city string) string {
 	return u.String()
 }
 
-func (c *WeatherClient) CurrentWeatherStatus(city string) (int, error) {
+func (c *WeatherClient) CurrentWeatherStatus(ctx context.Context, city string) (int, error) {
 	u := c.CurrentWeatherURL(city)
 
-	resp, err := c.httpClient.Get(u)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return 0, err
 	}

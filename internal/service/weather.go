@@ -1,6 +1,9 @@
 package service
 
-import "WeatherFlow/internal/client"
+import (
+	"WeatherFlow/internal/client"
+	"context"
+)
 
 type WeatherService struct {
 	client *client.WeatherClient
@@ -27,9 +30,9 @@ func NewWeatherService(client *client.WeatherClient) *WeatherService {
 	}
 }
 
-func (s *WeatherService) GetCurrent(city string) CurrentWeatherResponse {
+func (s *WeatherService) GetCurrent(ctx context.Context, city string) CurrentWeatherResponse {
 	url := s.client.CurrentWeatherURL(city)
-	status, err := s.client.CurrentWeatherStatus(city)
+	status, err := s.client.CurrentWeatherStatus(ctx, city)
 	if err != nil {
 		status = 0
 	}
@@ -39,7 +42,7 @@ func (s *WeatherService) GetCurrent(city string) CurrentWeatherResponse {
 		Temperature:    0,
 		Condition:      "stub",
 		SourceURL:      url,
-		ExternalStatus: int(status),
+		ExternalStatus: status,
 	}
 }
 
