@@ -2,7 +2,7 @@ package handler
 
 import "github.com/gin-gonic/gin"
 
-func writeJSON(c *gin.Context, status int, data gin.H) {
+func writeJSON(c *gin.Context, status int, data any) {
 	c.JSON(status, data)
 }
 

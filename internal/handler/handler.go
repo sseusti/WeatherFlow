@@ -3,11 +3,11 @@ package handler
 import "WeatherFlow/internal/service"
 
 type Handler struct {
-	WeatherService *service.WeatherService
+	weatherService *service.WeatherService
 }
 
 func New() *Handler {
 	return &Handler{
-		WeatherService: service.NewWeatherService(),
+		weatherService: service.NewWeatherService(),
 	}
 }

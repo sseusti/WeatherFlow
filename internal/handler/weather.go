@@ -13,7 +13,7 @@ func (h *Handler) GetCurrentWeather(c *gin.Context) {
 		return
 	}
 
-	writeJSON(c, http.StatusOK, h.WeatherService.GetCurrent(city))
+	writeJSON(c, http.StatusOK, h.weatherService.GetCurrent(city))
 	return
 }
 
@@ -24,6 +24,6 @@ func (h *Handler) GetWeatherByCity(c *gin.Context) {
 		return
 	}
 
-	writeJSON(c, http.StatusOK, h.WeatherService.GetByCity(city))
+	writeJSON(c, http.StatusOK, h.weatherService.GetByCity(city))
 	return
 }
