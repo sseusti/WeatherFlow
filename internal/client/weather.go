@@ -2,6 +2,7 @@ package client
 
 import (
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -33,5 +34,11 @@ func (c *WeatherClient) HTTPClient() *http.Client {
 }
 
 func (c *WeatherClient) CurrentWeatherURL(city string) string {
-	return c.baseURL + "/current?city=" + city
+	u, _ := url.Parse(c.baseURL)
+	u.Path = "/current"
+	q := u.Query()
+	q.Set("city", city)
+	u.RawQuery = q.Encode()
+
+	return u.String()
 }

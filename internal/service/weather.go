@@ -3,7 +3,7 @@ package service
 import "WeatherFlow/internal/client"
 
 type WeatherService struct {
-	Client *client.WeatherClient
+	client *client.WeatherClient
 }
 
 type CurrentWeatherResponse struct {
@@ -22,12 +22,12 @@ type CityWeatherResponse struct {
 
 func NewWeatherService(client *client.WeatherClient) *WeatherService {
 	return &WeatherService{
-		Client: client,
+		client: client,
 	}
 }
 
 func (s *WeatherService) GetCurrent(city string) CurrentWeatherResponse {
-	url := s.Client.CurrentWeatherURL(city)
+	url := s.client.CurrentWeatherURL(city)
 	return CurrentWeatherResponse{
 		City:        city,
 		Temperature: 0,
