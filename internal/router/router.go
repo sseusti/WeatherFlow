@@ -6,12 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter() *gin.Engine {
-	router := gin.New()
+func New() *gin.Engine {
+	r := gin.New()
 
-	router.Use(gin.Logger(), gin.Recovery())
+	r.Use(gin.Logger(), gin.Recovery())
 
-	router.GET("/health", handler.Health)
+	r.GET("/health", handler.Health)
 
-	return router
+	api := r.Group("/api/v1")
+	api.GET("/health", handler.Health)
+
+	return r
 }
