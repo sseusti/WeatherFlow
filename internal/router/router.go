@@ -15,6 +15,9 @@ func New() *gin.Engine {
 
 	apiV1 := r.Group("/api/v1")
 	apiV1.GET("/health", handler.Health)
-	apiV1.GET("/weather/current", handler.GetCurrentWeather)
+
+	weather := apiV1.Group("/weather")
+	weather.GET("/current", handler.GetCurrentWeather)
+
 	return r
 }
