@@ -1,20 +1,14 @@
 package main
 
 import (
-	"WeatherFlow/internal/handler"
+	"WeatherFlow/internal/router"
 	"log"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	router := gin.New()
+	r := router.NewRouter()
 
-	router.Use(gin.Recovery(), gin.Logger())
-
-	router.GET("/health", handler.Health)
-
-	err := router.Run(":8080")
+	err := r.Run(":8080")
 	if err != nil {
 		log.Fatal(err)
 	}
