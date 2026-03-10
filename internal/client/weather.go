@@ -6,17 +6,17 @@ import (
 )
 
 type WeatherClient struct {
-	baseURL string
-	timeout time.Duration
-	client  *http.Client
+	baseURL    string
+	timeout    time.Duration
+	httpClient *http.Client
 }
 
 func NewWeatherClient(baseURL string, timeout time.Duration) *WeatherClient {
 	client := &http.Client{Timeout: timeout}
 	return &WeatherClient{
-		baseURL: baseURL,
-		timeout: timeout,
-		client:  client,
+		baseURL:    baseURL,
+		timeout:    timeout,
+		httpClient: client,
 	}
 }
 
@@ -29,5 +29,9 @@ func (c *WeatherClient) Timeout() time.Duration {
 }
 
 func (c *WeatherClient) HTTPClient() *http.Client {
-	return c.client
+	return c.httpClient
+}
+
+func (c *WeatherClient) CurrentWeatherURL(city string) string {
+	return c.baseURL + "/current?city=" + city
 }

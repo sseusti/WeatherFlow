@@ -26,6 +26,7 @@ func NewWeatherService(client *client.WeatherClient) *WeatherService {
 }
 
 func (s *WeatherService) GetCurrent(city string) CurrentWeatherResponse {
+	//url := s.Client.CurrentWeatherURL(city)
 	return CurrentWeatherResponse{
 		City:        city,
 		Temperature: 0,
