@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ func (h *Handler) GetCurrentWeather(c *gin.Context) {
 
 	response, err := h.weatherService.GetCurrent(c.Request.Context(), city)
 	if err != nil {
+		log.Printf("failed to fetch external weather status: %v", err)
 		writeError(c, http.StatusInternalServerError, "failed to fetch external weather status")
 		return
 	}
