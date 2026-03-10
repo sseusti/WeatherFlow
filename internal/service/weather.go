@@ -1,6 +1,10 @@
 package service
 
-type WeatherService struct{}
+import "WeatherFlow/internal/client"
+
+type WeatherService struct {
+	Client client.WeatherClient
+}
 
 type CurrentWeatherResponse struct {
 	City        string
@@ -15,8 +19,10 @@ type CityWeatherResponse struct {
 	Source      string
 }
 
-func NewWeatherService() *WeatherService {
-	return &WeatherService{}
+func NewWeatherService(client client.WeatherClient) *WeatherService {
+	return &WeatherService{
+		Client: client,
+	}
 }
 
 func (s *WeatherService) GetCurrent(city string) CurrentWeatherResponse {
