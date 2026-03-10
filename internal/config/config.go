@@ -2,12 +2,13 @@ package config
 
 import (
 	"os"
+	"time"
 )
 
 type Config struct {
 	Port              string
 	WeatherAPIBaseURL string
-	RequestTimeout    string
+	RequestTimeout    time.Duration
 }
 
 func Load() *Config {
@@ -25,10 +26,11 @@ func Load() *Config {
 	if requestTimeout == "" {
 		requestTimeout = "5"
 	}
+	requestTimeoutParsed, _ := time.ParseDuration(requestTimeout)
 
 	return &Config{
 		Port:              port,
 		WeatherAPIBaseURL: weatherAPIBaseURL,
-		RequestTimeout:    requestTimeout,
+		RequestTimeout:    requestTimeoutParsed,
 	}
 }
