@@ -1,16 +1,13 @@
 package router
 
 import (
-	"WeatherFlow/internal/client"
 	"WeatherFlow/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
-func New() *gin.Engine {
+func New(h *handler.Handler) *gin.Engine {
 	r := gin.New()
-	weatherClient := client.NewWeatherClient("")
-	h := handler.New(weatherClient)
 
 	r.Use(gin.Logger(), gin.Recovery())
 

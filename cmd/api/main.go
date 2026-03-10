@@ -1,16 +1,16 @@
 package main
 
 import (
+	"WeatherFlow/internal/app"
 	"WeatherFlow/internal/config"
-	"WeatherFlow/internal/router"
 	"log"
 )
 
 func main() {
 	cfg := config.Load()
-	r := router.New()
+	application := app.New(cfg)
 
-	err := r.Run(":" + cfg.Port)
+	err := application.Router.Run(":" + cfg.Port)
 	if err != nil {
 		log.Fatal(err)
 	}
