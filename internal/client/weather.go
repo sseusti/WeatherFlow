@@ -77,3 +77,16 @@ func (c *WeatherClient) ForecastURL(lat, lon string) string {
 
 	return u.String()
 }
+
+func (c *WeatherClient) GeocodingURL(city string) string {
+	u, _ := url.Parse("https://geocoding-api.open-meteo.com")
+	u.Path = "/v1/search"
+
+	q := u.Query()
+	q.Set("name", city)
+	q.Set("count", "1")
+
+	u.RawQuery = q.Encode()
+
+	return u.String()
+}
