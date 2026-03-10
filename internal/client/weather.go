@@ -37,8 +37,10 @@ func (c *WeatherClient) HTTPClient() *http.Client {
 func (c *WeatherClient) CurrentWeatherURL(city string) string {
 	u, _ := url.Parse(c.baseURL)
 	u.Path = "/current"
+
 	q := u.Query()
 	q.Set("city", city)
+
 	u.RawQuery = q.Encode()
 
 	return u.String()
@@ -60,4 +62,18 @@ func (c *WeatherClient) CurrentWeatherStatus(ctx context.Context, city string) (
 	defer resp.Body.Close()
 
 	return resp.StatusCode, nil
+}
+
+func (c *WeatherClient) ForecastURL(lat, lon string) string {
+	u, _ := url.Parse(c.baseURL)
+	u.Path = "/v1/forecast"
+
+	q := u.Query()
+	q.Set("latitude", lat)
+	q.Set("longitude", lon)
+	q.Set("current", "temperature_2m")
+
+	u.RawQuery = q.Encode()
+
+	return u.String()
 }
