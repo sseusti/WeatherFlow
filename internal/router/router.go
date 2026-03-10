@@ -1,6 +1,7 @@
 package router
 
 import (
+	"WeatherFlow/internal/client"
 	"WeatherFlow/internal/handler"
 
 	"github.com/gin-gonic/gin"
@@ -8,7 +9,8 @@ import (
 
 func New() *gin.Engine {
 	r := gin.New()
-	h := handler.New()
+	weatherClient := client.NewWeatherClient("")
+	h := handler.New(weatherClient)
 
 	r.Use(gin.Logger(), gin.Recovery())
 
