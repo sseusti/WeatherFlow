@@ -90,3 +90,20 @@ func (c *WeatherClient) GeocodingURL(city string) string {
 
 	return u.String()
 }
+
+func (c *WeatherClient) GeocodingStatus(ctx context.Context, city string) (int, error) {
+	u := c.GeocodingURL(city)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return 0, err
+	}
+
+	defer resp.Body.Close()
+
+	return resp.StatusCode, nil
+}
