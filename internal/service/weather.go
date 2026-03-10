@@ -32,6 +32,6 @@ func (s *WeatherService) GetByCity(city string) CityWeatherResponse {
 		City:        city,
 		Temperature: 0,
 		Condition:   "stub",
-		Source:      "ok",
+		Source:      "path",
 	}
 }
