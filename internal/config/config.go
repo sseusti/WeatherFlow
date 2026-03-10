@@ -29,5 +29,6 @@ func Load() *Config {
 	return &Config{
 		Port:              port,
 		WeatherAPIBaseURL: weatherAPIBaseURL,
+		RequestTimeout:    requestTimeout,
 	}
 }
