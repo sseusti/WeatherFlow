@@ -1,7 +1,13 @@
 package handler
 
-type Handler struct{}
+import "WeatherFlow/internal/service"
+
+type Handler struct {
+	WeatherService *service.WeatherService
+}
 
 func New() *Handler {
-	return &Handler{}
+	return &Handler{
+		WeatherService: service.NewWeatherService(),
+	}
 }

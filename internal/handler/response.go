@@ -7,7 +7,7 @@ func writeJSON(c *gin.Context, status int, data gin.H) {
 }
 
 func writeError(c *gin.Context, status int, msg string) {
-	c.JSON(status, gin.H{
+	writeJSON(c, status, gin.H{
 		"error": msg,
 	})
 }
