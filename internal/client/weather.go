@@ -2,6 +2,8 @@ package client
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -11,6 +13,13 @@ type WeatherClient struct {
 	baseURL    string
 	timeout    time.Duration
 	httpClient *http.Client
+}
+
+type geocodingResponse struct {
+	Results []struct {
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+	} `json:"results"`
 }
 
 func NewWeatherClient(baseURL string, timeout time.Duration) *WeatherClient {
@@ -99,4 +108,30 @@ func (c *WeatherClient) getStatus(ctx context.Context, rawURL string) (int, erro
 	defer resp.Body.Close()
 
 	return resp.StatusCode, nil
+}
+
+func (c *WeatherClient) GeocodeCity(ctx context.Context, city string) (float64, float64, error) {
+	u := c.GeocodingURL(city)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return 0, 0, err
+	}
+
+	var geoResp geocodingResponse
+	err = json.NewDecoder(resp.Body).Decode(&geoResp)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	if len(geoResp.Results) == 0 {
+		return 0, 0, fmt.Errorf("city not found")
+	}
+
+	return geoResp.Results[0].Latitude, geoResp.Results[0].Longitude, nil
 }
