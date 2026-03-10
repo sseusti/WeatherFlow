@@ -3,7 +3,7 @@ package service
 import "WeatherFlow/internal/client"
 
 type WeatherService struct {
-	Client client.WeatherClient
+	Client *client.WeatherClient
 }
 
 type CurrentWeatherResponse struct {
@@ -19,7 +19,7 @@ type CityWeatherResponse struct {
 	Source      string
 }
 
-func NewWeatherService(client client.WeatherClient) *WeatherService {
+func NewWeatherService(client *client.WeatherClient) *WeatherService {
 	return &WeatherService{
 		Client: client,
 	}

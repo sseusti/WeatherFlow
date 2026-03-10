@@ -1,13 +1,16 @@
 package handler
 
-import "WeatherFlow/internal/service"
+import (
+	"WeatherFlow/internal/client"
+	"WeatherFlow/internal/service"
+)
 
 type Handler struct {
 	weatherService *service.WeatherService
 }
 
-func New() *Handler {
+func New(client client.WeatherClient) *Handler {
 	return &Handler{
-		weatherService: service.NewWeatherService(),
+		weatherService: service.NewWeatherService(client),
 	}
 }
