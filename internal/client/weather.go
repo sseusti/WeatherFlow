@@ -47,7 +47,11 @@ func (c *WeatherClient) CurrentWeatherURL(city string) string {
 func (c *WeatherClient) CurrentWeatherStatus(ctx context.Context, city string) (int, error) {
 	u := c.CurrentWeatherURL(city)
 
-	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return 0, err
+	}
+
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return 0, err
