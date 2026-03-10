@@ -8,9 +8,9 @@ import (
 
 func main() {
 	cfg := config.Load()
-	application := app.New(cfg)
+	a := app.New(cfg)
 
-	err := application.Router.Run(":" + cfg.Port)
+	err := a.Router.Run(":" + cfg.Port)
 	if err != nil {
 		log.Fatal(err)
 	}

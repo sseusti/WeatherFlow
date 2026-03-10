@@ -1,10 +1,13 @@
 package config
 
-import "os"
+import (
+	"os"
+)
 
 type Config struct {
 	Port              string
 	WeatherAPIBaseURL string
+	RequestTimeout    string
 }
 
 func Load() *Config {
@@ -16,6 +19,11 @@ func Load() *Config {
 	weatherAPIBaseURL := os.Getenv("WEATHER_API_BASE_URL")
 	if weatherAPIBaseURL == "" {
 		weatherAPIBaseURL = "https://api.open-meteo.com"
+	}
+
+	requestTimeout := os.Getenv("REQUEST_TIMEOUT")
+	if requestTimeout == "" {
+		requestTimeout = "5"
 	}
 
 	return &Config{

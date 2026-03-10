@@ -14,7 +14,7 @@ type App struct {
 }
 
 func New(cfg *config.Config) *App {
-	weatherClient := client.NewWeatherClient(cfg.WeatherAPIBaseURL)
+	weatherClient := client.NewWeatherClient(cfg.WeatherAPIBaseURL, cfg.RequestTimeout)
 	h := handler.New(weatherClient)
 	r := router.New(h)
 
