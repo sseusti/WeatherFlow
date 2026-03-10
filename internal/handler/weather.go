@@ -26,5 +26,29 @@ func GetCurrentWeather(c *gin.Context) {
 			"condition":   "stub",
 		},
 	)
+	return
+}
 
+func GetWeatherByCity(c *gin.Context) {
+	city := c.Param("city")
+	if city == "" {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "city is required",
+			},
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		gin.H{
+			"city":        "berlin",
+			"source":      "path",
+			"temperature": 0,
+			"condition":   "stub",
+		},
+	)
+	return
 }

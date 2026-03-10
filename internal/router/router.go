@@ -18,6 +18,7 @@ func New() *gin.Engine {
 
 	weather := apiV1.Group("/weather")
 	weather.GET("/current", handler.GetCurrentWeather)
+	weather.GET("/cities/:city", handler.GetWeatherByCity)
 
 	return r
 }
