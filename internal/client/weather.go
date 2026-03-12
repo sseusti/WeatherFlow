@@ -160,58 +160,6 @@ func (c *WeatherClient) ForecastStatus(ctx context.Context, lat, lon string) (in
 	return c.getStatus(ctx, u)
 }
 
-func (c *WeatherClient) CurrentTemperature(ctx context.Context, lat, lon string) (float64, error) {
-	u := c.ForecastURL(lat, lon)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return 0, err
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return 0, err
-	}
-
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
-	var forResp forecastResponse
-	err = json.NewDecoder(resp.Body).Decode(&forResp)
-	if err != nil {
-		return 0, err
-	}
-
-	return forResp.Current.Temperature, nil
-}
-
-func (c *WeatherClient) CurrentWeatherCode(ctx context.Context, lat, lon string) (int, error) {
-	u := c.ForecastURL(lat, lon)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return 0, err
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return 0, err
-	}
-
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
-	var forResp forecastResponse
-	err = json.NewDecoder(resp.Body).Decode(&forResp)
-	if err != nil {
-		return 0, err
-	}
-
-	return forResp.Current.WeatherCode, nil
-}
-
 func (c *WeatherClient) CurrentForecast(ctx context.Context, lat, lon string) (CurrentForecastData, error) {
 	u := c.ForecastURL(lat, lon)
 
