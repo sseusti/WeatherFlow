@@ -29,6 +29,11 @@ type forecastResponse struct {
 	} `json:"current"`
 }
 
+type CurrentForecastData struct {
+	Temperature float64
+	WeatherCode int
+}
+
 func NewWeatherClient(baseURL string, timeout time.Duration) *WeatherClient {
 	client := &http.Client{Timeout: timeout}
 	return &WeatherClient{
@@ -205,4 +210,34 @@ func (c *WeatherClient) CurrentWeatherCode(ctx context.Context, lat, lon string)
 	}
 
 	return forResp.Current.WeatherCode, nil
+}
+
+func (c *WeatherClient) CurrentForecast(ctx context.Context, lat, lon string) (CurrentForecastData, error) {
+	u := c.ForecastURL(lat, lon)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return CurrentForecastData{}, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return CurrentForecastData{}, err
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return CurrentForecastData{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	var forResp forecastResponse
+	err = json.NewDecoder(resp.Body).Decode(&forResp)
+	if err != nil {
+		return CurrentForecastData{}, err
+	}
+
+	return CurrentForecastData{
+		Temperature: forResp.Current.Temperature,
+		WeatherCode: forResp.Current.WeatherCode,
+	}, nil
 }

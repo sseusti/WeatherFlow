@@ -43,20 +43,15 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 
 	url := s.client.ForecastURL(latStr, lonStr)
 
-	temp, err := s.client.CurrentTemperature(ctx, latStr, lonStr)
-	if err != nil {
-		return CurrentWeatherResponse{}, err
-	}
-
-	weatherCode, err := s.client.CurrentWeatherCode(ctx, latStr, lonStr)
+	forecast, err := s.client.CurrentForecast(ctx, latStr, lonStr)
 	if err != nil {
 		return CurrentWeatherResponse{}, err
 	}
 
 	return CurrentWeatherResponse{
 		City:        city,
-		Temperature: temp,
-		Condition:   mapWeatherCode(weatherCode),
+		Temperature: forecast.Temperature,
+		Condition:   mapWeatherCode(forecast.WeatherCode),
 		SourceURL:   url,
 		Latitude:    lat,
 		Longitude:   lon,
