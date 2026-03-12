@@ -24,14 +24,16 @@ type geocodingResponse struct {
 
 type forecastResponse struct {
 	Current struct {
-		Temperature float64 `json:"temperature_2m"`
-		WeatherCode int     `json:"weather_code"`
+		Temperature         float64 `json:"temperature_2m"`
+		WeatherCode         int     `json:"weather_code"`
+		ApparentTemperature float64 `json:"apparent_temperature"`
 	} `json:"current"`
 }
 
 type CurrentForecastData struct {
 	Temperature float64
 	WeatherCode int
+	FeelsLike   float64
 }
 
 func NewWeatherClient(baseURL string, timeout time.Duration) *WeatherClient {
@@ -80,7 +82,7 @@ func (c *WeatherClient) ForecastURL(lat, lon string) string {
 	q := u.Query()
 	q.Set("latitude", lat)
 	q.Set("longitude", lon)
-	q.Set("current", "temperature_2m")
+	q.Set("current", "temperature_2m,apparent_temperature,weather_code")
 
 	u.RawQuery = q.Encode()
 
@@ -187,5 +189,6 @@ func (c *WeatherClient) CurrentForecast(ctx context.Context, lat, lon string) (C
 	return CurrentForecastData{
 		Temperature: forResp.Current.Temperature,
 		WeatherCode: forResp.Current.WeatherCode,
+		FeelsLike:   forResp.Current.ApparentTemperature,
 	}, nil
 }
