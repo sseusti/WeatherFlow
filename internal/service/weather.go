@@ -11,13 +11,12 @@ type WeatherService struct {
 }
 
 type CurrentWeatherResponse struct {
-	City           string  `json:"city"`
-	Temperature    float64 `json:"temperature"`
-	Condition      string  `json:"condition"`
-	SourceURL      string  `json:"source_url"`
-	ExternalStatus int     `json:"external_status"`
-	Latitude       float64 `json:"latitude"`
-	Longitude      float64 `json:"longitude"`
+	City        string  `json:"city"`
+	Temperature float64 `json:"temperature"`
+	Condition   string  `json:"condition"`
+	SourceURL   string  `json:"source_url"`
+	Latitude    float64 `json:"latitude"`
+	Longitude   float64 `json:"longitude"`
 }
 
 type CityWeatherResponse struct {
@@ -42,11 +41,6 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 	latStr := strconv.FormatFloat(lat, 'f', -1, 64)
 	lonStr := strconv.FormatFloat(lon, 'f', -1, 64)
 
-	status, err := s.client.ForecastStatus(ctx, latStr, lonStr)
-	if err != nil {
-		return CurrentWeatherResponse{}, err
-	}
-
 	url := s.client.ForecastURL(latStr, lonStr)
 
 	temp, err := s.client.CurrentTemperature(ctx, latStr, lonStr)
@@ -55,13 +49,12 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 	}
 
 	return CurrentWeatherResponse{
-		City:           city,
-		Temperature:    temp,
-		Condition:      "stub",
-		SourceURL:      url,
-		ExternalStatus: status,
-		Latitude:       lat,
-		Longitude:      lon,
+		City:        city,
+		Temperature: temp,
+		Condition:   "stub",
+		SourceURL:   url,
+		Latitude:    lat,
+		Longitude:   lon,
 	}, nil
 }
 
