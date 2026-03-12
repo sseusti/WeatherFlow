@@ -17,6 +17,7 @@ type CurrentWeatherResponse struct {
 	SourceURL   string  `json:"source_url"`
 	Latitude    float64 `json:"latitude"`
 	Longitude   float64 `json:"longitude"`
+	FeelsLike   float64 `json:"feels_like"`
 }
 
 type CityWeatherResponse struct {
@@ -55,6 +56,7 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 		SourceURL:   url,
 		Latitude:    lat,
 		Longitude:   lon,
+		FeelsLike:   forecast.FeelsLike,
 	}, nil
 }
 
