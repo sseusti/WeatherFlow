@@ -25,6 +25,7 @@ type geocodingResponse struct {
 type forecastResponse struct {
 	Current struct {
 		Temperature float64 `json:"temperature_2m"`
+		WeatherCode int     `json:"weather_code"`
 	} `json:"current"`
 }
 
@@ -178,4 +179,30 @@ func (c *WeatherClient) CurrentTemperature(ctx context.Context, lat, lon string)
 	}
 
 	return forResp.Current.Temperature, nil
+}
+
+func (c *WeatherClient) CurrentWeatherCode(ctx context.Context, lat, lon string) (int, error) {
+	u := c.ForecastURL(lat, lon)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return 0, err
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	var forResp forecastResponse
+	err = json.NewDecoder(resp.Body).Decode(&forResp)
+	if err != nil {
+		return 0, err
+	}
+
+	return forResp.Current.WeatherCode, nil
 }

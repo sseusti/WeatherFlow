@@ -48,10 +48,15 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 		return CurrentWeatherResponse{}, err
 	}
 
+	weatherCode, err := s.client.CurrentWeatherCode(ctx, latStr, lonStr)
+	if err != nil {
+		return CurrentWeatherResponse{}, err
+	}
+
 	return CurrentWeatherResponse{
 		City:        city,
 		Temperature: temp,
-		Condition:   "stub",
+		Condition:   mapWeatherCode(weatherCode),
 		SourceURL:   url,
 		Latitude:    lat,
 		Longitude:   lon,
@@ -65,4 +70,28 @@ func (s *WeatherService) GetByCity(city string) CityWeatherResponse {
 		Condition:   "stub",
 		Source:      "path",
 	}
+}
+
+func mapWeatherCode(code int) string {
+	mapper := map[int]string{
+		0:  "Clear",
+		1:  "Cloudy",
+		2:  "Cloudy",
+		3:  "Cloudy",
+		45: "Fog",
+		48: "Fog",
+		51: "Drizzle",
+		53: "Drizzle",
+		55: "Drizzle",
+		61: "Rain",
+		63: "Rain",
+		65: "Rain",
+	}
+
+	codeStr, ok := mapper[code]
+	if !ok {
+		return "Unknown"
+	}
+
+	return codeStr
 }
