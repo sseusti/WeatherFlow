@@ -11,18 +11,27 @@ type WeatherService struct {
 }
 
 type CurrentWeatherResponse struct {
-	City          string  `json:"city"`
-	Temperature   float64 `json:"temperature"`
-	Condition     string  `json:"condition"`
-	SourceURL     string  `json:"source_url"`
-	Latitude      float64 `json:"latitude"`
-	Longitude     float64 `json:"longitude"`
-	FeelsLike     float64 `json:"feels_like"`
-	WindSpeed     float64 `json:"wind_speed"`
-	Humidity      float64 `json:"humidity"`
-	IsDay         bool    `json:"is_day"`
-	Precipitation float64 `json:"precipitation"`
-	Time          string  `json:"time"`
+	City          string              `json:"city"`
+	Temperature   float64             `json:"temperature"`
+	Condition     string              `json:"condition"`
+	SourceURL     string              `json:"source_url"`
+	Latitude      float64             `json:"latitude"`
+	Longitude     float64             `json:"longitude"`
+	FeelsLike     float64             `json:"feels_like"`
+	WindSpeed     float64             `json:"wind_speed"`
+	Humidity      float64             `json:"humidity"`
+	IsDay         bool                `json:"is_day"`
+	Precipitation float64             `json:"precipitation"`
+	Time          string              `json:"time"`
+	Units         CurrentWeatherUnits `json:"units"`
+}
+
+type CurrentWeatherUnits struct {
+	Temperature   string `json:"temperature"`
+	FeelsLike     string `json:"feels_like"`
+	WindSpeed     string `json:"wind_speed"`
+	Humidity      string `json:"humidity"`
+	Precipitation string `json:"precipitation"`
 }
 
 type CityWeatherResponse struct {
@@ -67,6 +76,13 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 		IsDay:         forecast.IsDay == 1,
 		Precipitation: forecast.Precipitation,
 		Time:          forecast.Time,
+		Units: CurrentWeatherUnits{
+			Temperature:   "°C",
+			FeelsLike:     "°C",
+			WindSpeed:     "km/h",
+			Humidity:      "%",
+			Precipitation: "mm",
+		},
 	}, nil
 }
 
