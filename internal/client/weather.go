@@ -30,16 +30,18 @@ type forecastResponse struct {
 		WindSpeed           float64 `json:"wind_speed_10m"`
 		Humidity            float64 `json:"relative_humidity_2m"`
 		IsDay               int     `json:"is_day"`
+		Precipitation       float64 `json:"precipitation"`
 	} `json:"current"`
 }
 
 type CurrentForecastData struct {
-	Temperature float64
-	WeatherCode int
-	FeelsLike   float64
-	WindSpeed   float64
-	Humidity    float64
-	IsDay       int
+	Temperature   float64
+	WeatherCode   int
+	FeelsLike     float64
+	WindSpeed     float64
+	Humidity      float64
+	IsDay         int
+	Precipitation float64
 }
 
 func NewWeatherClient(baseURL string, timeout time.Duration) *WeatherClient {
@@ -88,7 +90,7 @@ func (c *WeatherClient) ForecastURL(lat, lon string) string {
 	q := u.Query()
 	q.Set("latitude", lat)
 	q.Set("longitude", lon)
-	q.Set("current", "temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,is_day")
+	q.Set("current", "temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,is_day,precipitation")
 
 	u.RawQuery = q.Encode()
 
@@ -193,11 +195,12 @@ func (c *WeatherClient) CurrentForecast(ctx context.Context, lat, lon string) (C
 	}
 
 	return CurrentForecastData{
-		Temperature: forResp.Current.Temperature,
-		WeatherCode: forResp.Current.WeatherCode,
-		FeelsLike:   forResp.Current.ApparentTemperature,
-		WindSpeed:   forResp.Current.WindSpeed,
-		Humidity:    forResp.Current.Humidity,
-		IsDay:       forResp.Current.IsDay,
+		Temperature:   forResp.Current.Temperature,
+		WeatherCode:   forResp.Current.WeatherCode,
+		FeelsLike:     forResp.Current.ApparentTemperature,
+		WindSpeed:     forResp.Current.WindSpeed,
+		Humidity:      forResp.Current.Humidity,
+		IsDay:         forResp.Current.IsDay,
+		Precipitation: forResp.Current.Precipitation,
 	}, nil
 }
