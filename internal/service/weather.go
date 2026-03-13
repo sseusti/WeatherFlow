@@ -22,6 +22,7 @@ type CurrentWeatherResponse struct {
 	Humidity      float64 `json:"humidity"`
 	IsDay         bool    `json:"is_day"`
 	Precipitation float64 `json:"precipitation"`
+	Time          string  `json:"time"`
 }
 
 type CityWeatherResponse struct {
@@ -65,6 +66,7 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 		Humidity:      forecast.Humidity,
 		IsDay:         forecast.IsDay == 1,
 		Precipitation: forecast.Precipitation,
+		Time:          forecast.Time,
 	}, nil
 }
 

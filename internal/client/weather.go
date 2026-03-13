@@ -31,6 +31,7 @@ type forecastResponse struct {
 		Humidity            float64 `json:"relative_humidity_2m"`
 		IsDay               int     `json:"is_day"`
 		Precipitation       float64 `json:"precipitation"`
+		Time                string  `json:"time"`
 	} `json:"current"`
 }
 
@@ -42,6 +43,7 @@ type CurrentForecastData struct {
 	Humidity      float64
 	IsDay         int
 	Precipitation float64
+	Time          string
 }
 
 func NewWeatherClient(baseURL string, timeout time.Duration) *WeatherClient {
@@ -202,5 +204,6 @@ func (c *WeatherClient) CurrentForecast(ctx context.Context, lat, lon string) (C
 		Humidity:      forResp.Current.Humidity,
 		IsDay:         forResp.Current.IsDay,
 		Precipitation: forResp.Current.Precipitation,
+		Time:          forResp.Current.Time,
 	}, nil
 }
