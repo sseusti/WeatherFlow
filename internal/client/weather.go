@@ -17,7 +17,7 @@ type WeatherClient struct {
 
 type geocodingResponse struct {
 	Results []struct {
-		Name      string  `json:"city_display_name"`
+		Name      string  `json:"name"`
 		Latitude  float64 `json:"latitude"`
 		Longitude float64 `json:"longitude"`
 	} `json:"results"`
@@ -105,7 +105,7 @@ func (c *WeatherClient) GeocodingURL(city string) string {
 	u.Path = "/v1/search"
 
 	q := u.Query()
-	q.Set("Name", city)
+	q.Set("name", city)
 	q.Set("count", "1")
 
 	u.RawQuery = q.Encode()
