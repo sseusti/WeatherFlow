@@ -17,10 +17,11 @@ type WeatherClient struct {
 
 type geocodingResponse struct {
 	Results []struct {
-		Name      string  `json:"name"`
-		Country   string  `json:"country"`
-		Latitude  float64 `json:"latitude"`
-		Longitude float64 `json:"longitude"`
+		Name        string  `json:"name"`
+		Country     string  `json:"country"`
+		CountryCode string  `json:"country_code"`
+		Latitude    float64 `json:"latitude"`
+		Longitude   float64 `json:"longitude"`
 	} `json:"results"`
 }
 
@@ -136,36 +137,36 @@ func (c *WeatherClient) getStatus(ctx context.Context, rawURL string) (int, erro
 	return resp.StatusCode, nil
 }
 
-func (c *WeatherClient) GeocodeCity(ctx context.Context, city string) (string, string, float64, float64, error) {
+func (c *WeatherClient) GeocodeCity(ctx context.Context, city string) (string, string, string, float64, float64, error) {
 	u := c.GeocodingURL(city)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
-		return "", "", 0, 0, err
+		return "", "", "", 0, 0, err
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", "", 0, 0, err
+		return "", "", "", 0, 0, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", "", 0, 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return "", "", "", 0, 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	var geoResp geocodingResponse
 	err = json.NewDecoder(resp.Body).Decode(&geoResp)
 	if err != nil {
-		return "", "", 0, 0, err
+		return "", "", "", 0, 0, err
 	}
 
 	if len(geoResp.Results) == 0 {
-		return "", "", 0, 0, fmt.Errorf("city not found")
+		return "", "", "", 0, 0, fmt.Errorf("city not found")
 	}
 
-	return geoResp.Results[0].Name, geoResp.Results[0].Country, geoResp.Results[0].Latitude, geoResp.Results[0].Longitude, nil
+	return geoResp.Results[0].Name, geoResp.Results[0].Country, geoResp.Results[0].CountryCode, geoResp.Results[0].Latitude, geoResp.Results[0].Longitude, nil
 }
 
 func (c *WeatherClient) ForecastStatus(ctx context.Context, lat, lon string) (int, error) {
