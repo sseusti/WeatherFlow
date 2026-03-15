@@ -37,6 +37,8 @@ type CurrentWeatherUnits struct {
 	WindSpeed     string `json:"wind_speed"`
 	Humidity      string `json:"humidity"`
 	Precipitation string `json:"precipitation"`
+	Latitude      string `json:"latitude"`
+	Longitude     string `json:"longitude"`
 }
 
 type CityWeatherResponse struct {
@@ -92,6 +94,8 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 			WindSpeed:     "km/h",
 			Humidity:      "%",
 			Precipitation: "mm",
+			Latitude:      "°",
+			Longitude:     "°",
 		},
 	}, nil
 }
