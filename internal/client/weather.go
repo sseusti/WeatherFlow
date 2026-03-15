@@ -167,7 +167,7 @@ func (c *WeatherClient) GeocodeCity(ctx context.Context, city string) (string, s
 		return "", "", "", "", 0, 0, fmt.Errorf("city not found")
 	}
 
-	return geoResp.Results[0].Name, geoResp.Results[0].Country, geoResp.Results[0].CountryCode, geoResp.Results[0].CountryCode, geoResp.Results[0].Latitude, geoResp.Results[0].Longitude, nil
+	return geoResp.Results[0].Name, geoResp.Results[0].Country, geoResp.Results[0].CountryCode, geoResp.Results[0].Timezone, geoResp.Results[0].Latitude, geoResp.Results[0].Longitude, nil
 }
 
 func (c *WeatherClient) ForecastStatus(ctx context.Context, lat, lon string) (int, error) {
