@@ -27,6 +27,7 @@ type CurrentWeatherResponse struct {
 	Country         string              `json:"country"`
 	CountryCode     string              `json:"country_code"`
 	Timezone        string              `json:"timezone"`
+	Elevation       float64             `json:"elevation"`
 	Units           CurrentWeatherUnits `json:"units"`
 }
 
@@ -52,7 +53,7 @@ func NewWeatherService(client *client.WeatherClient) *WeatherService {
 }
 
 func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWeatherResponse, error) {
-	displayName, country, countryCode, timezone, lat, lon, err := s.client.GeocodeCity(ctx, city)
+	displayName, country, countryCode, timezone, elevation, lat, lon, err := s.client.GeocodeCity(ctx, city)
 	if err != nil {
 		return CurrentWeatherResponse{}, err
 	}
@@ -84,6 +85,7 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 		Country:         country,
 		CountryCode:     countryCode,
 		Timezone:        timezone,
+		Elevation:       elevation,
 		Units: CurrentWeatherUnits{
 			Temperature:   "°C",
 			FeelsLike:     "°C",
