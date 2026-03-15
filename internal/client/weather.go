@@ -51,6 +51,16 @@ type CurrentForecastData struct {
 	Time          string
 }
 
+type GeocodedLocation struct {
+	Name        string
+	Country     string
+	CountryCode string
+	Timezone    string
+	Elevation   float64
+	Latitude    float64
+	Longitude   float64
+}
+
 func NewWeatherClient(baseURL string, timeout time.Duration) *WeatherClient {
 	client := &http.Client{Timeout: timeout}
 	return &WeatherClient{
@@ -139,36 +149,43 @@ func (c *WeatherClient) getStatus(ctx context.Context, rawURL string) (int, erro
 	return resp.StatusCode, nil
 }
 
-func (c *WeatherClient) GeocodeCity(ctx context.Context, city string) (string, string, string, string, float64, float64, float64, error) {
+func (c *WeatherClient) GeocodeCity(ctx context.Context, city string) (GeocodedLocation, error) {
 	u := c.GeocodingURL(city)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
-		return "", "", "", "", 0, 0, 0, err
+		return GeocodedLocation{}, err
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", "", "", "", 0, 0, 0, err
+		return GeocodedLocation{}, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", "", "", "", 0, 0, 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return GeocodedLocation{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	var geoResp geocodingResponse
 	err = json.NewDecoder(resp.Body).Decode(&geoResp)
 	if err != nil {
-		return "", "", "", "", 0, 0, 0, err
+		return GeocodedLocation{}, err
 	}
 
 	if len(geoResp.Results) == 0 {
-		return "", "", "", "", 0, 0, 0, fmt.Errorf("city not found")
+		return GeocodedLocation{}, fmt.Errorf("city not found")
 	}
 
-	return geoResp.Results[0].Name, geoResp.Results[0].Country, geoResp.Results[0].CountryCode, geoResp.Results[0].Timezone, geoResp.Results[0].Elevation, geoResp.Results[0].Latitude, geoResp.Results[0].Longitude, nil
+	return GeocodedLocation{geoResp.Results[0].Name,
+		geoResp.Results[0].Country,
+		geoResp.Results[0].CountryCode,
+		geoResp.Results[0].Timezone,
+		geoResp.Results[0].Elevation,
+		geoResp.Results[0].Latitude,
+		geoResp.Results[0].Longitude,
+	}, nil
 }
 
 func (c *WeatherClient) ForecastStatus(ctx context.Context, lat, lon string) (int, error) {

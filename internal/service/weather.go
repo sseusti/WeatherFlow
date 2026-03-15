@@ -53,13 +53,13 @@ func NewWeatherService(client *client.WeatherClient) *WeatherService {
 }
 
 func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWeatherResponse, error) {
-	displayName, country, countryCode, timezone, elevation, lat, lon, err := s.client.GeocodeCity(ctx, city)
+	location, err := s.client.GeocodeCity(ctx, city)
 	if err != nil {
 		return CurrentWeatherResponse{}, err
 	}
 
-	latStr := strconv.FormatFloat(lat, 'f', -1, 64)
-	lonStr := strconv.FormatFloat(lon, 'f', -1, 64)
+	latStr := strconv.FormatFloat(location.Latitude, 'f', -1, 64)
+	lonStr := strconv.FormatFloat(location.Longitude, 'f', -1, 64)
 
 	url := s.client.ForecastURL(latStr, lonStr)
 
@@ -73,19 +73,19 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 		Temperature:     forecast.Temperature,
 		Condition:       mapWeatherCode(forecast.WeatherCode),
 		SourceURL:       url,
-		Latitude:        lat,
-		Longitude:       lon,
+		Latitude:        location.Latitude,
+		Longitude:       location.Longitude,
 		FeelsLike:       forecast.FeelsLike,
 		WindSpeed:       forecast.WindSpeed,
 		Humidity:        forecast.Humidity,
 		IsDay:           forecast.IsDay == 1,
 		Precipitation:   forecast.Precipitation,
 		Time:            forecast.Time,
-		CityDisplayName: displayName,
-		Country:         country,
-		CountryCode:     countryCode,
-		Timezone:        timezone,
-		Elevation:       elevation,
+		CityDisplayName: location.Name,
+		Country:         location.Country,
+		CountryCode:     location.CountryCode,
+		Timezone:        location.Timezone,
+		Elevation:       location.Elevation,
 		Units: CurrentWeatherUnits{
 			Temperature:   "°C",
 			FeelsLike:     "°C",
