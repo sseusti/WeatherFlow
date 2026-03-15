@@ -11,19 +11,20 @@ type WeatherService struct {
 }
 
 type CurrentWeatherResponse struct {
-	City          string              `json:"city"`
-	Temperature   float64             `json:"temperature"`
-	Condition     string              `json:"condition"`
-	SourceURL     string              `json:"source_url"`
-	Latitude      float64             `json:"latitude"`
-	Longitude     float64             `json:"longitude"`
-	FeelsLike     float64             `json:"feels_like"`
-	WindSpeed     float64             `json:"wind_speed"`
-	Humidity      float64             `json:"humidity"`
-	IsDay         bool                `json:"is_day"`
-	Precipitation float64             `json:"precipitation"`
-	Time          string              `json:"time"`
-	Units         CurrentWeatherUnits `json:"units"`
+	City            string              `json:"city"`
+	Temperature     float64             `json:"temperature"`
+	Condition       string              `json:"condition"`
+	SourceURL       string              `json:"source_url"`
+	Latitude        float64             `json:"latitude"`
+	Longitude       float64             `json:"longitude"`
+	FeelsLike       float64             `json:"feels_like"`
+	WindSpeed       float64             `json:"wind_speed"`
+	Humidity        float64             `json:"humidity"`
+	IsDay           bool                `json:"is_day"`
+	Precipitation   float64             `json:"precipitation"`
+	Time            string              `json:"time"`
+	Units           CurrentWeatherUnits `json:"units"`
+	CityDisplayName string              `json:"city_display_name"`
 }
 
 type CurrentWeatherUnits struct {
@@ -48,7 +49,7 @@ func NewWeatherService(client *client.WeatherClient) *WeatherService {
 }
 
 func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWeatherResponse, error) {
-	lat, lon, err := s.client.GeocodeCity(ctx, city)
+	displayName, lat, lon, err := s.client.GeocodeCity(ctx, city)
 	if err != nil {
 		return CurrentWeatherResponse{}, err
 	}
@@ -64,18 +65,19 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 	}
 
 	return CurrentWeatherResponse{
-		City:          city,
-		Temperature:   forecast.Temperature,
-		Condition:     mapWeatherCode(forecast.WeatherCode),
-		SourceURL:     url,
-		Latitude:      lat,
-		Longitude:     lon,
-		FeelsLike:     forecast.FeelsLike,
-		WindSpeed:     forecast.WindSpeed,
-		Humidity:      forecast.Humidity,
-		IsDay:         forecast.IsDay == 1,
-		Precipitation: forecast.Precipitation,
-		Time:          forecast.Time,
+		City:            city,
+		Temperature:     forecast.Temperature,
+		Condition:       mapWeatherCode(forecast.WeatherCode),
+		SourceURL:       url,
+		Latitude:        lat,
+		Longitude:       lon,
+		FeelsLike:       forecast.FeelsLike,
+		WindSpeed:       forecast.WindSpeed,
+		Humidity:        forecast.Humidity,
+		IsDay:           forecast.IsDay == 1,
+		Precipitation:   forecast.Precipitation,
+		Time:            forecast.Time,
+		CityDisplayName: displayName,
 		Units: CurrentWeatherUnits{
 			Temperature:   "°C",
 			FeelsLike:     "°C",
