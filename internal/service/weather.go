@@ -25,14 +25,15 @@ type CurrentWeatherResponse struct {
 }
 
 type CurrentWeatherLocation struct {
-	City            string  `json:"city"`
-	CityDisplayName string  `json:"city_display_name"`
-	Country         string  `json:"country"`
-	CountryCode     string  `json:"country_code"`
-	Timezone        string  `json:"timezone"`
-	Elevation       float64 `json:"elevation"`
-	Latitude        float64 `json:"latitude"`
-	Longitude       float64 `json:"longitude"`
+	City            string                      `json:"city"`
+	CityDisplayName string                      `json:"city_display_name"`
+	Country         string                      `json:"country"`
+	CountryCode     string                      `json:"country_code"`
+	Timezone        string                      `json:"timezone"`
+	Elevation       float64                     `json:"elevation"`
+	Latitude        float64                     `json:"latitude"`
+	Longitude       float64                     `json:"longitude"`
+	Units           CurrentWeatherLocationUnits `json:"units"`
 }
 
 type CurrentWeatherUnits struct {
@@ -50,6 +51,12 @@ type CityWeatherResponse struct {
 	Temperature int    `json:"temperature"`
 	Condition   string `json:"condition"`
 	Source      string `json:"source"`
+}
+
+type CurrentWeatherLocationUnits struct {
+	Latitude  string `json:"latitude"`
+	Longitude string `json:"longitude"`
+	Elevation string `json:"elevation"`
 }
 
 func NewWeatherService(client *client.WeatherClient) *WeatherService {
@@ -93,6 +100,11 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 			Elevation:       location.Elevation,
 			Latitude:        location.Latitude,
 			Longitude:       location.Longitude,
+			Units: CurrentWeatherLocationUnits{
+				Latitude:  "°",
+				Longitude: "°",
+				Elevation: "m",
+			},
 		},
 		Units: CurrentWeatherUnits{
 			Temperature:   "°C",
