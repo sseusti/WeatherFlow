@@ -35,3 +35,14 @@ func (h *Handler) GetWeatherByCity(c *gin.Context) {
 	writeJSON(c, http.StatusOK, h.weatherService.GetByCity(city))
 	return
 }
+
+func (h *Handler) GetHourlyWeatherByCity(c *gin.Context) {
+	city := c.Param("city")
+	if city == "" {
+		writeError(c, http.StatusBadRequest, "city is required")
+		return
+	}
+
+	writeJSON(c, http.StatusOK, h.weatherService.GetByCity(city))
+	return
+}

@@ -27,6 +27,18 @@ type geocodingResponse struct {
 	} `json:"results"`
 }
 
+type hourlyForecastResponse struct {
+	Hourly struct {
+		Time        []string  `json:"time"`
+		Temperature []float64 `json:"temperature_2m"`
+	} `json:"hourly"`
+}
+
+type HourlyForecastPoint struct {
+	Time        string
+	Temperature float64
+}
+
 type forecastResponse struct {
 	Current struct {
 		Temperature         float64 `json:"temperature_2m"`
@@ -108,6 +120,20 @@ func (c *WeatherClient) ForecastURL(lat, lon string) string {
 	q.Set("latitude", lat)
 	q.Set("longitude", lon)
 	q.Set("current", "temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,is_day,precipitation")
+
+	u.RawQuery = q.Encode()
+
+	return u.String()
+}
+
+func (c *WeatherClient) HourlyForecastURL(lat, lon string) string {
+	u, _ := url.Parse(c.baseURL)
+	u.Path = "/v1/forecast"
+
+	q := u.Query()
+	q.Set("latitude", lat)
+	q.Set("longitude", lon)
+	q.Set("hourly", "temperature_2m")
 
 	u.RawQuery = q.Encode()
 
@@ -228,4 +254,46 @@ func (c *WeatherClient) CurrentForecast(ctx context.Context, lat, lon string) (C
 		Precipitation: forResp.Current.Precipitation,
 		Time:          forResp.Current.Time,
 	}, nil
+}
+
+func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]HourlyForecastPoint, error) {
+	u := c.HourlyForecastURL(lat, lon)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	var hourlyResp hourlyForecastResponse
+	err = json.NewDecoder(resp.Body).Decode(&hourlyResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(hourlyResp.Hourly.Time) <= 1 || len(hourlyResp.Hourly.Temperature) <= 1 {
+		return nil, fmt.Errorf("forecast not found")
+	}
+	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) {
+		return nil, fmt.Errorf("forecast time length mismatch")
+	}
+
+	var hourlyPoints []HourlyForecastPoint
+	for i := 0; i < len(hourlyResp.Hourly.Time)-1; i++ {
+		hourlyPoints = append(hourlyPoints, HourlyForecastPoint{
+			Time:        hourlyResp.Hourly.Time[i],
+			Temperature: hourlyResp.Hourly.Temperature[i],
+		})
+	}
+
+	return hourlyPoints, nil
 }
