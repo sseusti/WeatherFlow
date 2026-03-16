@@ -285,7 +285,7 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 	if len(hourlyResp.Hourly.Time) == 0 || len(hourlyResp.Hourly.Temperature) == 0 || len(hourlyResp.Hourly.ApparentTemperature) == 0 {
 		return nil, fmt.Errorf("forecast not found")
 	}
-	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) && len(hourlyResp.Hourly.Temperature) != len(hourlyResp.Hourly.ApparentTemperature) {
+	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) || len(hourlyResp.Hourly.Temperature) != len(hourlyResp.Hourly.ApparentTemperature) {
 		return nil, fmt.Errorf("forecast time length mismatch")
 	}
 
