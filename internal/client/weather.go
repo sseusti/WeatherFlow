@@ -29,14 +29,16 @@ type geocodingResponse struct {
 
 type hourlyForecastResponse struct {
 	Hourly struct {
-		Time        []string  `json:"time"`
-		Temperature []float64 `json:"temperature_2m"`
+		Time                []string  `json:"time"`
+		Temperature         []float64 `json:"temperature_2m"`
+		ApparentTemperature []float64 `json:"apparent_temperature"`
 	} `json:"hourly"`
 }
 
 type HourlyForecastPoint struct {
 	Time        string
 	Temperature float64
+	FeelsLike   float64
 }
 
 type forecastResponse struct {
@@ -133,7 +135,7 @@ func (c *WeatherClient) HourlyForecastURL(lat, lon string) string {
 	q := u.Query()
 	q.Set("latitude", lat)
 	q.Set("longitude", lon)
-	q.Set("hourly", "temperature_2m")
+	q.Set("hourly", "temperature_2m,apparent_temperature")
 
 	u.RawQuery = q.Encode()
 
@@ -280,10 +282,10 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 		return nil, err
 	}
 
-	if len(hourlyResp.Hourly.Time) == 0 || len(hourlyResp.Hourly.Temperature) == 0 {
+	if len(hourlyResp.Hourly.Time) == 0 || len(hourlyResp.Hourly.Temperature) == 0 || len(hourlyResp.Hourly.ApparentTemperature) == 0 {
 		return nil, fmt.Errorf("forecast not found")
 	}
-	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) {
+	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) && len(hourlyResp.Hourly.Temperature) != len(hourlyResp.Hourly.ApparentTemperature) {
 		return nil, fmt.Errorf("forecast time length mismatch")
 	}
 
@@ -292,6 +294,7 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 		hourlyPoints = append(hourlyPoints, HourlyForecastPoint{
 			Time:        hourlyResp.Hourly.Time[i],
 			Temperature: hourlyResp.Hourly.Temperature[i],
+			FeelsLike:   hourlyResp.Hourly.ApparentTemperature[i],
 		})
 	}
 
