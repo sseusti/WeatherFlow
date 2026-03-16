@@ -69,6 +69,11 @@ type HourlyWeatherPoint struct {
 type HourlyWeatherResponse struct {
 	Location CurrentWeatherLocation `json:"location"`
 	Hourly   []HourlyWeatherPoint   `json:"hourly"`
+	Units    HourlyWeatherUnits     `json:"units"`
+}
+
+type HourlyWeatherUnits struct {
+	Temperature string `json:"temperature"`
 }
 
 func NewWeatherService(client *client.WeatherClient) *WeatherService {
@@ -144,7 +149,7 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeat
 		return HourlyWeatherResponse{}, err
 	}
 
-	Location := CurrentWeatherLocation{
+	locationResp := CurrentWeatherLocation{
 		City:            city,
 		CityDisplayName: location.Name,
 		Country:         location.Country,
@@ -160,17 +165,20 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeat
 		},
 	}
 
-	Hourly := make([]HourlyWeatherPoint, len(points))
+	hourlyResp := make([]HourlyWeatherPoint, len(points))
 	for i := 0; i < len(points); i++ {
-		Hourly[i] = HourlyWeatherPoint{
+		hourlyResp[i] = HourlyWeatherPoint{
 			Time:        points[i].Time,
 			Temperature: points[i].Temperature,
 		}
 	}
 
 	return HourlyWeatherResponse{
-		Location: Location,
-		Hourly:   Hourly,
+		Location: locationResp,
+		Hourly:   hourlyResp,
+		Units: HourlyWeatherUnits{
+			Temperature: "°C",
+		},
 	}, nil
 }
 
