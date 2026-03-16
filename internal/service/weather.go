@@ -120,6 +120,23 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 	}, nil
 }
 
+func (s *WeatherService) GetHourly(ctx context.Context, city string) ([]client.HourlyForecastPoint, error) {
+	location, err := s.client.GeocodeCity(ctx, city)
+	if err != nil {
+		return nil, err
+	}
+
+	latStr := strconv.FormatFloat(location.Latitude, 'f', -1, 64)
+	lonStr := strconv.FormatFloat(location.Longitude, 'f', -1, 64)
+
+	points, err := s.client.HourlyForecast(ctx, latStr, lonStr)
+	if err != nil {
+		return nil, err
+	}
+
+	return points, err
+}
+
 func (s *WeatherService) GetByCity(city string) CityWeatherResponse {
 	return CityWeatherResponse{
 		City:        city,

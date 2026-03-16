@@ -280,7 +280,7 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 		return nil, err
 	}
 
-	if len(hourlyResp.Hourly.Time) <= 1 || len(hourlyResp.Hourly.Temperature) <= 1 {
+	if len(hourlyResp.Hourly.Time) == 0 || len(hourlyResp.Hourly.Temperature) == 0 {
 		return nil, fmt.Errorf("forecast not found")
 	}
 	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) {
@@ -288,7 +288,7 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 	}
 
 	var hourlyPoints []HourlyForecastPoint
-	for i := 0; i < len(hourlyResp.Hourly.Time)-1; i++ {
+	for i := 0; i < len(hourlyResp.Hourly.Time); i++ {
 		hourlyPoints = append(hourlyPoints, HourlyForecastPoint{
 			Time:        hourlyResp.Hourly.Time[i],
 			Temperature: hourlyResp.Hourly.Temperature[i],
