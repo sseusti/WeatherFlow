@@ -61,6 +61,16 @@ type CurrentWeatherData struct {
 	IsDay         bool    `json:"is_day"`
 }
 
+type HourlyWeatherPoint struct {
+	Time        string  `json:"time"`
+	Temperature float64 `json:"temperature"`
+}
+
+type HourlyWeatherResponse struct {
+	Location CurrentWeatherLocation `json:"location"`
+	Hourly   []HourlyWeatherPoint   `json:"hourly"`
+}
+
 func NewWeatherService(client *client.WeatherClient) *WeatherService {
 	return &WeatherService{
 		client: client,
@@ -120,10 +130,10 @@ func (s *WeatherService) GetCurrent(ctx context.Context, city string) (CurrentWe
 	}, nil
 }
 
-func (s *WeatherService) GetHourly(ctx context.Context, city string) ([]client.HourlyForecastPoint, error) {
+func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeatherResponse, error) {
 	location, err := s.client.GeocodeCity(ctx, city)
 	if err != nil {
-		return nil, err
+		return HourlyWeatherResponse{}, err
 	}
 
 	latStr := strconv.FormatFloat(location.Latitude, 'f', -1, 64)
@@ -131,10 +141,37 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) ([]client.H
 
 	points, err := s.client.HourlyForecast(ctx, latStr, lonStr)
 	if err != nil {
-		return nil, err
+		return HourlyWeatherResponse{}, err
 	}
 
-	return points, err
+	Location := CurrentWeatherLocation{
+		City:            city,
+		CityDisplayName: location.Name,
+		Country:         location.Country,
+		CountryCode:     location.CountryCode,
+		Timezone:        location.Timezone,
+		Elevation:       location.Elevation,
+		Latitude:        location.Latitude,
+		Longitude:       location.Longitude,
+		Units: CurrentWeatherLocationUnits{
+			Latitude:  "°",
+			Longitude: "°",
+			Elevation: "m",
+		},
+	}
+
+	Hourly := make([]HourlyWeatherPoint, len(points))
+	for i := 0; i < len(points); i++ {
+		Hourly[i] = HourlyWeatherPoint{
+			Time:        points[i].Time,
+			Temperature: points[i].Temperature,
+		}
+	}
+
+	return HourlyWeatherResponse{
+		Location: Location,
+		Hourly:   Hourly,
+	}, nil
 }
 
 func (s *WeatherService) GetByCity(city string) CityWeatherResponse {
