@@ -67,6 +67,9 @@ type HourlyWeatherPoint struct {
 	FeelsLike     float64 `json:"feels_like"`
 	Precipitation float64 `json:"precipitation"`
 	Condition     string  `json:"condition"`
+	IsDay         bool    `json:"is_day"`
+	WindSpeed     float64 `json:"wind_speed"`
+	Humidity      float64 `json:"humidity"`
 }
 
 type HourlyWeatherResponse struct {
@@ -79,6 +82,8 @@ type HourlyWeatherUnits struct {
 	Temperature   string `json:"temperature"`
 	FeelsLike     string `json:"feels_like"`
 	Precipitation string `json:"precipitation"`
+	WindSpeed     string `json:"wind_speed"`
+	Humidity      string `json:"humidity"`
 }
 
 func NewWeatherService(client *client.WeatherClient) *WeatherService {
@@ -178,6 +183,9 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeat
 			FeelsLike:     points[i].FeelsLike,
 			Precipitation: points[i].Precipitation,
 			Condition:     mapWeatherCode(points[i].WeatherCode),
+			IsDay:         points[i].IsDay == 1,
+			WindSpeed:     points[i].WindSpeed,
+			Humidity:      points[i].Humidity,
 		}
 	}
 
@@ -188,6 +196,8 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeat
 			Temperature:   "°C",
 			FeelsLike:     "°C",
 			Precipitation: "mm",
+			WindSpeed:     "km/h",
+			Humidity:      "%",
 		},
 	}, nil
 }

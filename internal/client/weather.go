@@ -34,6 +34,9 @@ type hourlyForecastResponse struct {
 		ApparentTemperature []float64 `json:"apparent_temperature"`
 		Precipitation       []float64 `json:"precipitation"`
 		WeatherCode         []int     `json:"weather_code"`
+		IsDay               []int     `json:"is_day"`
+		WindSpeed           []float64 `json:"wind_speed"`
+		Humidity            []float64 `json:"humidity"`
 	} `json:"hourly"`
 }
 
@@ -43,6 +46,9 @@ type HourlyForecastPoint struct {
 	FeelsLike     float64
 	Precipitation float64
 	WeatherCode   int
+	IsDay         int
+	WindSpeed     float64
+	Humidity      float64
 }
 
 type forecastResponse struct {
@@ -139,7 +145,7 @@ func (c *WeatherClient) HourlyForecastURL(lat, lon string) string {
 	q := u.Query()
 	q.Set("latitude", lat)
 	q.Set("longitude", lon)
-	q.Set("hourly", "temperature_2m,apparent_temperature,precipitation,weather_code")
+	q.Set("hourly", "temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,relative_humidity_2m,is_day")
 
 	u.RawQuery = q.Encode()
 
@@ -286,10 +292,21 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 		return nil, err
 	}
 
-	if len(hourlyResp.Hourly.Time) == 0 || len(hourlyResp.Hourly.Temperature) == 0 || len(hourlyResp.Hourly.ApparentTemperature) == 0 || len(hourlyResp.Hourly.Precipitation) == 0 {
+	if len(hourlyResp.Hourly.Time) == 0 ||
+		len(hourlyResp.Hourly.Temperature) == 0 ||
+		len(hourlyResp.Hourly.ApparentTemperature) == 0 ||
+		len(hourlyResp.Hourly.Precipitation) == 0 ||
+		len(hourlyResp.Hourly.IsDay) == 0 ||
+		len(hourlyResp.Hourly.WindSpeed) == 0 ||
+		len(hourlyResp.Hourly.Humidity) == 0 {
 		return nil, fmt.Errorf("forecast not found")
 	}
-	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) || len(hourlyResp.Hourly.Temperature) != len(hourlyResp.Hourly.ApparentTemperature) || len(hourlyResp.Hourly.Precipitation) != len(hourlyResp.Hourly.Time) {
+	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) ||
+		len(hourlyResp.Hourly.Temperature) != len(hourlyResp.Hourly.ApparentTemperature) ||
+		len(hourlyResp.Hourly.Precipitation) != len(hourlyResp.Hourly.Time) ||
+		len(hourlyResp.Hourly.IsDay) != len(hourlyResp.Hourly.ApparentTemperature) ||
+		len(hourlyResp.Hourly.WindSpeed) != len(hourlyResp.Hourly.Time) ||
+		len(hourlyResp.Hourly.Humidity) != len(hourlyResp.Hourly.Precipitation) {
 		return nil, fmt.Errorf("forecast time length mismatch")
 	}
 
@@ -301,6 +318,9 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 			FeelsLike:     hourlyResp.Hourly.ApparentTemperature[i],
 			Precipitation: hourlyResp.Hourly.Precipitation[i],
 			WeatherCode:   hourlyResp.Hourly.WeatherCode[i],
+			IsDay:         hourlyResp.Hourly.IsDay[i],
+			WindSpeed:     hourlyResp.Hourly.WindSpeed[i],
+			Humidity:      hourlyResp.Hourly.Humidity[i],
 		})
 	}
 
