@@ -298,15 +298,17 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 		len(hourlyResp.Hourly.Precipitation) == 0 ||
 		len(hourlyResp.Hourly.IsDay) == 0 ||
 		len(hourlyResp.Hourly.WindSpeed) == 0 ||
-		len(hourlyResp.Hourly.Humidity) == 0 {
+		len(hourlyResp.Hourly.Humidity) == 0 ||
+		len(hourlyResp.Hourly.WeatherCode) == 0 {
 		return nil, fmt.Errorf("forecast not found")
 	}
 	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) ||
-		len(hourlyResp.Hourly.Temperature) != len(hourlyResp.Hourly.ApparentTemperature) ||
-		len(hourlyResp.Hourly.Precipitation) != len(hourlyResp.Hourly.Time) ||
-		len(hourlyResp.Hourly.IsDay) != len(hourlyResp.Hourly.ApparentTemperature) ||
-		len(hourlyResp.Hourly.WindSpeed) != len(hourlyResp.Hourly.Time) ||
-		len(hourlyResp.Hourly.Humidity) != len(hourlyResp.Hourly.Precipitation) {
+		len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.ApparentTemperature) ||
+		len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Precipitation) ||
+		len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.WeatherCode) ||
+		len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.IsDay) ||
+		len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.WindSpeed) ||
+		len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Humidity) {
 		return nil, fmt.Errorf("forecast time length mismatch")
 	}
 
