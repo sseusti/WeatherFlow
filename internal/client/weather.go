@@ -33,6 +33,7 @@ type hourlyForecastResponse struct {
 		Temperature         []float64 `json:"temperature_2m"`
 		ApparentTemperature []float64 `json:"apparent_temperature"`
 		Precipitation       []float64 `json:"precipitation"`
+		WeatherCode         []int     `json:"weather_code"`
 	} `json:"hourly"`
 }
 
@@ -41,6 +42,7 @@ type HourlyForecastPoint struct {
 	Temperature   float64
 	FeelsLike     float64
 	Precipitation float64
+	WeatherCode   int
 }
 
 type forecastResponse struct {
@@ -137,7 +139,7 @@ func (c *WeatherClient) HourlyForecastURL(lat, lon string) string {
 	q := u.Query()
 	q.Set("latitude", lat)
 	q.Set("longitude", lon)
-	q.Set("hourly", "temperature_2m,apparent_temperature,precipitation")
+	q.Set("hourly", "temperature_2m,apparent_temperature,precipitation,weather_code")
 
 	u.RawQuery = q.Encode()
 
@@ -298,6 +300,7 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 			Temperature:   hourlyResp.Hourly.Temperature[i],
 			FeelsLike:     hourlyResp.Hourly.ApparentTemperature[i],
 			Precipitation: hourlyResp.Hourly.Precipitation[i],
+			WeatherCode:   hourlyResp.Hourly.WeatherCode[i],
 		})
 	}
 

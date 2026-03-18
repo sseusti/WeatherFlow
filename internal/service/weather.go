@@ -66,6 +66,7 @@ type HourlyWeatherPoint struct {
 	Temperature   float64 `json:"temperature"`
 	FeelsLike     float64 `json:"feels_like"`
 	Precipitation float64 `json:"precipitation"`
+	Condition     string  `json:"condition"`
 }
 
 type HourlyWeatherResponse struct {
@@ -176,6 +177,7 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeat
 			Temperature:   points[i].Temperature,
 			FeelsLike:     points[i].FeelsLike,
 			Precipitation: points[i].Precipitation,
+			Condition:     mapWeatherCode(points[i].WeatherCode),
 		}
 	}
 
