@@ -62,9 +62,10 @@ type CurrentWeatherData struct {
 }
 
 type HourlyWeatherPoint struct {
-	Time        string  `json:"time"`
-	Temperature float64 `json:"temperature"`
-	FeelsLike   float64 `json:"feels_like"`
+	Time          string  `json:"time"`
+	Temperature   float64 `json:"temperature"`
+	FeelsLike     float64 `json:"feels_like"`
+	Precipitation float64 `json:"precipitation"`
 }
 
 type HourlyWeatherResponse struct {
@@ -74,8 +75,9 @@ type HourlyWeatherResponse struct {
 }
 
 type HourlyWeatherUnits struct {
-	Temperature string `json:"temperature"`
-	FeelsLike   string `json:"feels_like"`
+	Temperature   string `json:"temperature"`
+	FeelsLike     string `json:"feels_like"`
+	Precipitation string `json:"precipitation"`
 }
 
 func NewWeatherService(client *client.WeatherClient) *WeatherService {
@@ -170,9 +172,10 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeat
 	hourlyResp := make([]HourlyWeatherPoint, len(points))
 	for i := 0; i < len(points); i++ {
 		hourlyResp[i] = HourlyWeatherPoint{
-			Time:        points[i].Time,
-			Temperature: points[i].Temperature,
-			FeelsLike:   points[i].FeelsLike,
+			Time:          points[i].Time,
+			Temperature:   points[i].Temperature,
+			FeelsLike:     points[i].FeelsLike,
+			Precipitation: points[i].Precipitation,
 		}
 	}
 
@@ -180,8 +183,9 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeat
 		Location: locationResp,
 		Hourly:   hourlyResp,
 		Units: HourlyWeatherUnits{
-			Temperature: "°C",
-			FeelsLike:   "°C",
+			Temperature:   "°C",
+			FeelsLike:     "°C",
+			Precipitation: "mm",
 		},
 	}, nil
 }

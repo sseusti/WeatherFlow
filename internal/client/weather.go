@@ -32,13 +32,15 @@ type hourlyForecastResponse struct {
 		Time                []string  `json:"time"`
 		Temperature         []float64 `json:"temperature_2m"`
 		ApparentTemperature []float64 `json:"apparent_temperature"`
+		Precipitation       []float64 `json:"precipitation"`
 	} `json:"hourly"`
 }
 
 type HourlyForecastPoint struct {
-	Time        string
-	Temperature float64
-	FeelsLike   float64
+	Time          string
+	Temperature   float64
+	FeelsLike     float64
+	Precipitation float64
 }
 
 type forecastResponse struct {
@@ -135,7 +137,7 @@ func (c *WeatherClient) HourlyForecastURL(lat, lon string) string {
 	q := u.Query()
 	q.Set("latitude", lat)
 	q.Set("longitude", lon)
-	q.Set("hourly", "temperature_2m,apparent_temperature")
+	q.Set("hourly", "temperature_2m,apparent_temperature,precipitation")
 
 	u.RawQuery = q.Encode()
 
@@ -282,19 +284,20 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 		return nil, err
 	}
 
-	if len(hourlyResp.Hourly.Time) == 0 || len(hourlyResp.Hourly.Temperature) == 0 || len(hourlyResp.Hourly.ApparentTemperature) == 0 {
+	if len(hourlyResp.Hourly.Time) == 0 || len(hourlyResp.Hourly.Temperature) == 0 || len(hourlyResp.Hourly.ApparentTemperature) == 0 || len(hourlyResp.Hourly.Precipitation) == 0 {
 		return nil, fmt.Errorf("forecast not found")
 	}
-	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) || len(hourlyResp.Hourly.Temperature) != len(hourlyResp.Hourly.ApparentTemperature) {
+	if len(hourlyResp.Hourly.Time) != len(hourlyResp.Hourly.Temperature) || len(hourlyResp.Hourly.Temperature) != len(hourlyResp.Hourly.ApparentTemperature) || len(hourlyResp.Hourly.Precipitation) != len(hourlyResp.Hourly.Time) {
 		return nil, fmt.Errorf("forecast time length mismatch")
 	}
 
 	var hourlyPoints []HourlyForecastPoint
 	for i := 0; i < len(hourlyResp.Hourly.Time); i++ {
 		hourlyPoints = append(hourlyPoints, HourlyForecastPoint{
-			Time:        hourlyResp.Hourly.Time[i],
-			Temperature: hourlyResp.Hourly.Temperature[i],
-			FeelsLike:   hourlyResp.Hourly.ApparentTemperature[i],
+			Time:          hourlyResp.Hourly.Time[i],
+			Temperature:   hourlyResp.Hourly.Temperature[i],
+			FeelsLike:     hourlyResp.Hourly.ApparentTemperature[i],
+			Precipitation: hourlyResp.Hourly.Precipitation[i],
 		})
 	}
 
