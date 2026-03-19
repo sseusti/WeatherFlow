@@ -86,6 +86,24 @@ type HourlyWeatherUnits struct {
 	Humidity      string `json:"humidity"`
 }
 
+type DailyWeatherResponse struct {
+	Location CurrentWeatherLocation `json:"location"`
+	Daily    []DailyWeatherPoint    `json:"daily"`
+	Units    DailyWeatherUnits      `json:"units"`
+}
+
+type DailyWeatherUnits struct {
+	MaxTemperature string `json:"max_temperature"`
+	MinTemperature string `json:"min_temperature"`
+}
+
+type DailyWeatherPoint struct {
+	Date             string  `json:"date"`
+	MaxTemperature   float64 `json:"max_temperature"`
+	MinTemperature   float64 `json:"min_temperature"`
+	WeatherCondition string  `json:"weather_condition"`
+}
+
 func NewWeatherService(client *client.WeatherClient) *WeatherService {
 	return &WeatherService{
 		client: client,
@@ -198,6 +216,56 @@ func (s *WeatherService) GetHourly(ctx context.Context, city string) (HourlyWeat
 			Precipitation: "mm",
 			WindSpeed:     "km/h",
 			Humidity:      "%",
+		},
+	}, nil
+}
+
+func (s *WeatherService) GetDaily(ctx context.Context, city string) (DailyWeatherResponse, error) {
+	location, err := s.client.GeocodeCity(ctx, city)
+	if err != nil {
+		return DailyWeatherResponse{}, err
+	}
+
+	latStr := strconv.FormatFloat(location.Latitude, 'f', -1, 64)
+	lonStr := strconv.FormatFloat(location.Longitude, 'f', -1, 64)
+
+	points, err := s.client.DailyForecast(ctx, latStr, lonStr)
+	if err != nil {
+		return DailyWeatherResponse{}, err
+	}
+
+	locationResp := CurrentWeatherLocation{
+		City:            city,
+		CityDisplayName: location.Name,
+		Country:         location.Country,
+		CountryCode:     location.CountryCode,
+		Timezone:        location.Timezone,
+		Elevation:       location.Elevation,
+		Latitude:        location.Latitude,
+		Longitude:       location.Longitude,
+		Units: CurrentWeatherLocationUnits{
+			Latitude:  "°",
+			Longitude: "°",
+			Elevation: "m",
+		},
+	}
+
+	dailyResp := make([]DailyWeatherPoint, len(points))
+	for i := 0; i < len(points); i++ {
+		dailyResp[i] = DailyWeatherPoint{
+			Date:             points[i].Date,
+			MaxTemperature:   points[i].MaxTemperature,
+			MinTemperature:   points[i].MinTemperature,
+			WeatherCondition: mapWeatherCode(points[i].WeatherCode),
+		}
+	}
+
+	return DailyWeatherResponse{
+		Location: locationResp,
+		Daily:    dailyResp,
+		Units: DailyWeatherUnits{
+			MaxTemperature: "°C",
+			MinTemperature: "°C",
 		},
 	}, nil
 }

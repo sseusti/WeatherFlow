@@ -20,6 +20,7 @@ func New(h *handler.Handler) *gin.Engine {
 	weather.GET("/current", h.GetCurrentWeather)
 	weather.GET("/cities/:city", h.GetWeatherByCity)
 	weather.GET("/hourly", h.GetHourlyWeatherByCity)
+	weather.GET("/daily", h.GetDailyWeatherByCity)
 
 	return r
 }

@@ -64,6 +64,22 @@ type forecastResponse struct {
 	} `json:"current"`
 }
 
+type dailyForecastResponse struct {
+	Daily struct {
+		Date           []string  `json:"time"`
+		MaxTemperature []float64 `json:"temperature_2m_max"`
+		MinTemperature []float64 `json:"temperature_2m_min"`
+		WeatherCode    []int     `json:"weather_code"`
+	}
+}
+
+type DailyForecastPoint struct {
+	Date           string
+	MaxTemperature float64
+	MinTemperature float64
+	WeatherCode    int
+}
+
 type CurrentForecastData struct {
 	Temperature   float64
 	WeatherCode   int
@@ -146,6 +162,20 @@ func (c *WeatherClient) HourlyForecastURL(lat, lon string) string {
 	q.Set("latitude", lat)
 	q.Set("longitude", lon)
 	q.Set("hourly", "temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,relative_humidity_2m,is_day")
+
+	u.RawQuery = q.Encode()
+
+	return u.String()
+}
+
+func (c *WeatherClient) DailyForecastURL(lat, lon string) string {
+	u, _ := url.Parse(c.baseURL)
+	u.Path = "/v1/forecast"
+
+	q := u.Query()
+	q.Set("latitude", lat)
+	q.Set("longitude", lon)
+	q.Set("daily", "temperature_2m_max,temperature_2m_min,weather_code")
 
 	u.RawQuery = q.Encode()
 
@@ -327,4 +357,54 @@ func (c *WeatherClient) HourlyForecast(ctx context.Context, lat, lon string) ([]
 	}
 
 	return hourlyPoints, nil
+}
+
+func (c *WeatherClient) DailyForecast(ctx context.Context, lat, lon string) ([]DailyForecastPoint, error) {
+	u := c.DailyForecastURL(lat, lon)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	var dailyResp dailyForecastResponse
+	err = json.NewDecoder(resp.Body).Decode(&dailyResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(dailyResp.Daily.Date) == 0 ||
+		len(dailyResp.Daily.MaxTemperature) == 0 ||
+		len(dailyResp.Daily.MinTemperature) == 0 ||
+		len(dailyResp.Daily.WeatherCode) == 0 {
+		return nil, fmt.Errorf("daily forecast not found")
+	}
+
+	if len(dailyResp.Daily.Date) != len(dailyResp.Daily.MaxTemperature) ||
+		len(dailyResp.Daily.Date) != len(dailyResp.Daily.MinTemperature) ||
+		len(dailyResp.Daily.Date) != len(dailyResp.Daily.WeatherCode) {
+		return nil, fmt.Errorf("daily forecast time length mismatch")
+	}
+
+	var dailyPoints []DailyForecastPoint
+	for i := 0; i < len(dailyResp.Daily.Date); i++ {
+		dailyPoints = append(dailyPoints, DailyForecastPoint{
+			Date:           dailyResp.Daily.Date[i],
+			MaxTemperature: dailyResp.Daily.MaxTemperature[i],
+			MinTemperature: dailyResp.Daily.MinTemperature[i],
+			WeatherCode:    dailyResp.Daily.WeatherCode[i],
+		})
+	}
+
+	return dailyPoints, nil
 }

@@ -53,3 +53,21 @@ func (h *Handler) GetHourlyWeatherByCity(c *gin.Context) {
 	writeJSON(c, http.StatusOK, response)
 	return
 }
+
+func (h *Handler) GetDailyWeatherByCity(c *gin.Context) {
+	city := c.Query("city")
+	if city == "" {
+		writeError(c, http.StatusBadRequest, "city is required")
+		return
+	}
+
+	response, err := h.weatherService.GetDaily(c.Request.Context(), city)
+	if err != nil {
+		log.Printf("failed to fetch external weather status: %v", err)
+		writeError(c, http.StatusInternalServerError, "failed to fetch external weather status")
+		return
+	}
+
+	writeJSON(c, http.StatusOK, response)
+	return
+}
